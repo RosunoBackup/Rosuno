@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# rosuno-guard v3 (P2-919): merge-boundary check posted as the required status "rosuno-guard".
+# rosuno-guard v4 (P2-920; v3 from P2-919): merge-boundary check posted as the required status "rosuno-guard".
 # Reads Git objects only; executes nothing from the PR. The trusted runner supplies every input.
 #
 # Usage: rosuno-guard.sh <base> <head> <head-branch> <approved-ref>
@@ -10,11 +10,13 @@
 #                   so a byte-identical Packet proves the Packet is the owner-adopted one (revisions are
 #                   ordinary forward-only owner commits on that branch).
 #
-# Rules (UOM v1.7.10 §28 / C1 rev5.11 §C1.3):
+# Rules (UOM v2.0 §§5, 9, 14 / C1 rev6.0 §C1.3):
 #   R0  up to date: <base> is an ancestor of <head>, so the checked net diff is exactly what lands on main.
 #   R1  branch is wi/<ID>[-slug].
-#   R2  the PR adds docs/work-items/<ID>/PACKET.md, byte-identical to the owner-approved Packet; header fields
-#       exactly once, WORK_ITEM/BRANCH bound to the branch. BASE_SHA is provenance only.
+#   R2  docs/work-items/<ID>/PACKET.md at head is byte-identical to the owner-approved Packet; header fields
+#       exactly once, WORK_ITEM/BRANCH bound to the branch. BASE_SHA is provenance only. A Packet already on main
+#       (merged work item) authorizes in-scope corrections when unchanged or when the head carries the owner's
+#       revision from the owner branch (v4); the net diff is still judged against its scope.
 #   R3  every path in the net diff base..head is inside ALLOWED_SCOPE and outside FORBIDDEN_SCOPE (FORBIDDEN wins,
 #       case-insensitive); PROCESS-only control paths need TYPE: PROCESS; regular files only; no private
 #       authority, submodule or credential files; other work-item Packets only as literal carried records.
@@ -43,7 +45,7 @@ git merge-base --is-ancestor "$BASE" "$HEAD" || fail "head does not contain curr
 
 # R2: approval binding
 [ "$(git ls-tree "$HEAD" -- "$PK" | cut -d' ' -f1-2)" = "100644 blob" ] || fail "Packet $PK missing at head or not a regular file"
-git cat-file -e "$BASE:$PK" 2>/dev/null && fail "Packet $PK already exists on main (a merged work item is not reused; use a new work item)"
+MERGED=0; git cat-file -e "$BASE:$PK" 2>/dev/null && MERGED=1
 AB="$(git rev-parse -q --verify "$APPROVED:$PK" 2>/dev/null)" || fail "owner branch $BRANCH has no $PK (Packet not adopted by the owner)"
 HB="$(git rev-parse "$HEAD:$PK")"
 [ "$AB" = "$HB" ] || fail "Packet differs from the owner-approved Packet on owner branch $BRANCH (sync the Packet copy)"
@@ -114,7 +116,7 @@ while IFS= read -r -d '' META && IFS= read -r -d '' P; do
   for m in "$SM" "$DM"; do case "$m" in 000000|100644|100755) ;; *) e "[final diff] $P has git mode $m (symlink/submodule/special objects are not allowed)";; esac; done
   L="$(lc "$P")"
   if [ "$L" = "$(lc "$PK")" ]; then
-    { [ "$P" = "$PK" ] && [ "$ST" = A ]; } || e "$P case-aliases or alters the Packet"
+    { [ "$P" = "$PK" ] && { [ "$ST" = A ] || { [ "$MERGED" = 1 ] && [ "$ST" = M ]; }; }; } || e "$P case-aliases or alters the Packet"
     continue
   fi
   case "$L" in

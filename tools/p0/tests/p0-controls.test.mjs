@@ -2326,6 +2326,21 @@ test("P2-900 exact Cloud Builder paths reject near-misses", () => {
   }
 });
 
+test("P2-920 owner-placed tool configuration paths are admitted exactly", () => {
+  for (const [state, packageJson] of rootPackageFixtures()) {
+    assert.doesNotThrow(() =>
+      validateNeutralPaths([".mcp.json", "AGENTS.md"], packageJson, state),
+    );
+    for (const file of [".mcp.json.bak", "agents.md", "tools/.mcp.json"]) {
+      assert.throws(
+        () => validateNeutralPaths([".mcp.json", file], packageJson, state),
+        /product implementation paths/,
+        `${state}: ${file}`,
+      );
+    }
+  }
+});
+
 // P2-905 REV3 §3A: six named PROCESS files are admitted as exact paths beside
 // the five P2-900 Cloud Builder paths. The neutral-path gate compares path
 // strings only; Git object modes are enforced by rosuno-guard, exercised on
