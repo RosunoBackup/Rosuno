@@ -348,6 +348,28 @@
       },
       "rollback_reference": "Verified Staging defects require a separately authorized, reviewed forward-only compensating migration with default-deny registration; preserve this migration and all prior SQL/migration history bytes.",
       "created_at": "2026-10-23T02:53:59Z"
+    },
+    {
+      "release_id": "REL-20261114-P3-904-STAGING-APPLICATION",
+      "commit_sha": "fc31ed34763c44d5ada0c0d749e0a3e901e96519",
+      "work_item_refs": ["WI-P2-P3-904-P3-003-SECURITY-CORRECTION"],
+      "decision_refs": ["DEC-20261113-P3-904-P3-003-SECURITY-CORRECTION"],
+      "migration_refs": ["20261106090000_p3_904_professional_write_boundary"],
+      "validation_evidence": [
+        "governance/evidence/p3-904-governance-lifecycle-closure.json",
+        "supabase/migrations/20261106090000_p3_904_professional_write_boundary.sql",
+        "Gate 5 rollback-validation script sha256:d8c561ebd3f31f3ed16ff673267df626882ae4c3a6dedf34d5755df546215847 (14/14, ROLLBACK, restoration EXACT)",
+        "Gate 6 independent post-application verification results sha256:05bb8b602e569386b3d89c94388751a8a3e55426f9ca188d5a2401e6200e7f6b (10/10)",
+        "Owner-retained Gate 5 and Gate 6 evidence ZIP sha256:6e36c85a10862546d9af5a90df7c80f35057101fdb3f6f225b8b41e1aaf61809"
+      ],
+      "artifact_digest": "sha256:7f05e4066a245471a8e33d5cfb27a539373eb75b270a17990afced441e4ebbe1",
+      "environment": "staging",
+      "reviewer": {
+        "identity": "Rosuno",
+        "status": "approved"
+      },
+      "rollback_reference": "Applied to Rosuno Staging only. A verified defect requires a separately authorized, reviewed forward-only corrective migration that restores the prior function definitions and grants; this migration, every earlier migration and the migration history stay byte-identical, and no evidence, evaluation or audit row is removed.",
+      "created_at": "2026-11-14T14:51:22Z"
     }
   ]
 }

@@ -8352,6 +8352,10 @@ export function validateNeutralPaths(
     ".github/workflows/rosuno-process-guard.yml",
     "docs/process/p2-905-enablement-contract.md",
     "docs/process/github-to-replit-sync.md",
+    // P2-920 (UOM v2.0 §13): owner-placed tool configuration is admitted as
+    // exact paths; the guard keeps both PROCESS-only and owner-merged.
+    ".mcp.json",
+    "AGENTS.md",
   ]);
   const allowedP1Files = new Set([
     "supabase/migrations/20260828192126_p0_restrict_rls_auto_enable_execution.sql",

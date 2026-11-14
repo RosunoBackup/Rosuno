@@ -1693,17 +1693,53 @@
       "owner": "NatthanPrevot",
       "reviewer": {
         "identity": "Rosuno",
-        "status": "pending"
+        "status": "approved"
       },
       "created_at": "2026-11-13T12:02:23Z",
-      "updated_at": "2026-11-13T12:02:23Z",
+      "updated_at": "2026-11-14T14:51:22Z",
       "supersedes": [],
-      "impact": "Repository only until a separately authorized application: one unapplied migration candidate and the corrected attorney and staff write paths. No Staging, Production, release or live database effect.",
+      "impact": "Merged to owner main through PR #93 (fc31ed3); the unchanged migration was then applied to Rosuno Staging only, under separately authorized Gates 5 and 6 (release REL-20261114-P3-904-STAGING-APPLICATION). Attorney and staff professional writes now require the P3-904 database functions, so builds older than fc31ed3 cannot write the eight M4 relations. No Production application, hosting deployment, activation or business-row change.",
       "evidence": [
         "Owner adoption: P3-904 Packet revision 3 commit c986509de535e3a57f877eb8eea711049c7581fd on owner branch wi/P3-904-p3-003-security-correction (parent 279a066b2fb3a46aecec5554d4f680344d14b0a3), Packet SHA-256 e9df0b5148c7de69c01433e3930c99f9401a3db16bec25dcda2e36a50947b18f, Git blob 02d5a4a9ae8b8e391ff7908e2c60a6cf4909a871.",
         "Independent Backup Gate 0 PASS of revision 3, accepted by the owner before adoption.",
         "Original P3-904 implementation commits 2cfd62900f3d4281fb813f9e1ceac4cafc6d226e, 90ef51fcaac6d5737ed41cd4465dc99bcb7c9898 and 1c4acec9df60fa0c59f8bd61e8053d744ed36478, recovered from evidence archive SHA-256 f641fde3fd69fe38fab61d099f41163ac7f79a7878c23bddd3c92085301e2e3e and carried unchanged.",
-        "Disposable PostgreSQL proof of the corrected migration (SHA-256 7f05e4066a245471a8e33d5cfb27a539373eb75b270a17990afced441e4ebbe1) with synthetic test data only: authorization, concurrency, atomicity, eligibility decision integrity, application and database parity, rollback-only validation and catalog reconciliation against an explicit allowlist. Not a claim about Staging or any persistent environment."
+        "Disposable PostgreSQL proof of the corrected migration (SHA-256 7f05e4066a245471a8e33d5cfb27a539373eb75b270a17990afced441e4ebbe1) with synthetic test data only: authorization, concurrency, atomicity, eligibility decision integrity, application and database parity, rollback-only validation and catalog reconciliation against an explicit allowlist. Not a claim about Staging or any persistent environment.",
+        "PR #93 approved by Rosuno on exact head 692d8a8e1ab94c0db070e1b78ba9a977a5eb08f4 (review 5897022551, 2026-11-13T19:43:51Z); required checks succeeded on that head (P0 workflow run 43493010756; trusted rosuno-guard run 43493309956 and its exact-head commit status); merged 2026-11-13T19:48:48Z as fc31ed34763c44d5ada0c0d749e0a3e901e96519, whose tree equals the reviewed head tree.",
+        "Exact-head independent security review required by UOM v1.7.10 §59.1 and REV3 §1: NOT EVIDENCED and not claimed. The requirement was removed prospectively by UOM v2.0 / DL-ENG-2 G1 (express owner adoption received in the Builder session at 2026-11-14T14:33:36Z); the owner accepted the P3-904 security status on the recorded evidence.",
+        "Gate 5 rollback validation on Rosuno Staging (PostgreSQL 17.11) under owner-granted AP-2: script sha256 d8c561ebd3f31f3ed16ff673267df626882ae4c3a6dedf34d5755df546215847, 14 of 14 checks, catalog diff equal to the 40-entry allowlist, transaction 2013 aborted, restoration exact.",
+        "Gate 6: owner-executed Supabase CLI 2.116.0 db push from fc31ed3, dry run listing only this migration, one application, exit 0; Supabase version 20261106090000 recorded. Independent read-only verification 10 of 10 (results sha256 05bb8b602e569386b3d89c94388751a8a3e55426f9ca188d5a2401e6200e7f6b).",
+        "New Staging baseline rosuno-staging-p3-904-20261114-v1: full post-P2-scope catalog afd6e96d2b2d8c87c012878c1d5033af6da00f174c0747735a9c714a99aa106a (658560 bytes, 1970 rows); 13 new security-advisor warnings classified by design."
+      ],
+      "expiry": null
+    },
+    {
+      "decision_id": "DEC-20261114-P2-920-DL-ENG-2-GOVERNANCE-SIMPLIFICATION",
+      "title": "Adopt DL-ENG-2 governance simplification: optional independent review, single-authorization engineering and lightweight closure",
+      "status": "accepted",
+      "scope": "Engineering process only, under the process provisions the LOCKED authorities route to the Decision Log (Implementation Master Plan section 47; MVP Build Specification sections 30 and 32; Physical Specification section 53). No product, domain, physical-model, policy or gated matter.",
+      "decision": "The owner adopts DL-ENG-2, rulings G1 to G6, exactly as recorded in governance/dl-eng-2-governance-simplification.md (SHA-256 e379629f854fd99c49a428e942c32678f934a5248ee6753d9fbc99cd1aba13ee), together with UOM v2.0 (SHA-256 5ffbf00e94aae182aca8c53e4b922d75310129af68aa97b4a85165ef5599874b) and C1 rev6.0 (SHA-256 9c0fe6d7153d3edc548c54e7e9c09b52753b9f924fca84c7dcccaeb90f982d21), owner-held texts. DL-ENG-1 remains in force except the first sentence of R4 (independent review now optional) and R3 as amended by G3.",
+      "rationale": "Independent review, repeated approval gates and per-item closure work slowed development without a LOCKED requirement: the LOCKED authorities require designated human approval before merge, required CI, a security/integrity review step, migration gates and production release controls, all of which are kept.",
+      "authority_refs": [
+        "IMPLEMENTATION-MASTER-PLAN-V1.0-LOCKED",
+        "MVP-BUILD-SPECIFICATION-V1.0-LOCKED",
+        "MASTER-BLUEPRINT-V1-LOCKED",
+        "PHYSICAL-SUPABASE-POSTGRES-V1.0-LOCKED",
+        "TECHNICAL-ARCHITECTURE-V0.2-LOCKED"
+      ],
+      "work_item_refs": [],
+      "owner": "NatthanPrevot",
+      "reviewer": {
+        "identity": "Rosuno",
+        "status": "pending"
+      },
+      "created_at": "2026-11-14T14:51:22Z",
+      "updated_at": "2026-11-14T14:51:22Z",
+      "supersedes": [],
+      "impact": "Process only: the guard accepts in-scope corrections under a merged Packet; Builder settings no longer block owner-enabled tools; instructions, PR template and closure practice are simplified. No database, product or production effect.",
+      "evidence": [
+        "Owner adoption: P2-920 Packet commit 5d8e45afa0f3dbeba00d22e44c6ea94d2726a5c3 on owner branch wi/P2-920-governance-simplification; express owner adoption statement (approver NatthanPrevot) received in the Builder session at 2026-11-14T14:33:36Z, before that commit, naming the adopted SHA-256 values",
+        "Exact rulings text: governance/dl-eng-2-governance-simplification.md, SHA-256 e379629f854fd99c49a428e942c32678f934a5248ee6753d9fbc99cd1aba13ee",
+        "Optional independent review: not performed"
       ],
       "expiry": null
     }

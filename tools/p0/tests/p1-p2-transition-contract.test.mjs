@@ -165,7 +165,8 @@ test("P1 closure preserves deferred Physical 1L and the accepted database baseli
     "20260921051204_p1_compliance_foundation",
   );
   // Preserve the exact historical baseline check when no appended migration
-  // exists; otherwise require the single independently accepted P2-007 suffix.
+  // exists; otherwise require the accepted P2-007 suffix as a pinned historical
+  // prefix (P2-920: later appended baselines are validated by the validators).
   if (baseline.migration_inventory.length === HISTORICAL_MIGRATION_COUNT) {
     assert.equal(baseline.baseline_id, "rosuno-staging-p1-011-20260923-v1");
     assert.equal(
@@ -177,8 +178,7 @@ test("P1 closure preserves deferred Physical 1L and the accepted database baseli
       "196caee4de2c870652ce5b716a9b02c484c97181b1d9c59e5abbc5c2966b2d65",
     );
   } else {
-    assert.equal(baseline.baseline_id, "rosuno-staging-p2-007-20261022-v1");
-    assert.equal(baseline.migration_inventory.length, 14);
+    assert.ok(baseline.migration_inventory.length >= 14);
     assert.equal(
       sha256("governance/evidence/p1-011-governance-lifecycle-closure.json"),
       "7a95c0350f5be2836671513431f4c9c8982d60eb362d7561c12f3bc758e8ae73",
@@ -228,12 +228,27 @@ test("P1 closure preserves deferred Physical 1L and the accepted database baseli
       baseline.migration_inventory[13].sha256,
       "32649648b0d75763ba1003957d24febffc2050951ca49b962687c2427a5f4db5",
     );
+    const p2007Manifest = {
+      baseline_id: "rosuno-staging-p2-007-20261022-v1",
+      checked_environment: "staging",
+      project: { name: "Rosuno Staging", project_ref: "mxjlvmowmodzdtdfgqpb" },
+      migration_inventory: baseline.migration_inventory.slice(0, 14),
+      accepted_evidence: baseline.accepted_evidence.slice(0, 12),
+      catalog_fingerprint: {
+        format: "rosuno-p1-catalog-v1",
+        sha256:
+          "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d",
+        canonical_byte_length: 658601,
+        row_count: 1970,
+      },
+    };
     assert.equal(
-      baseline.catalog_fingerprint.sha256,
-      "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d",
+      "sha256:" +
+        createHash("sha256")
+          .update(JSON.stringify(p2007Manifest))
+          .digest("hex"),
+      "sha256:5233572ad1c0ef93ca01391bf3dd0dd6c9ea5735a33d4d547bce297ecd4877d5",
     );
-    assert.equal(baseline.catalog_fingerprint.canonical_byte_length, 658601);
-    assert.equal(baseline.catalog_fingerprint.row_count, 1970);
   }
   assert.equal(
     releases.releases.some(

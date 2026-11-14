@@ -526,13 +526,86 @@ describe("P2-919 live guard: preserved protections", () => {
     assertPass(run(withMigrations, { [added]: "select 1;\n" }));
   });
 
-  test("PRESERVED: a merged work item's Packet cannot be reused", () => {
+  test("CHANGED (v4, P2-920): an unchanged merged Packet authorizes in-scope corrections only", () => {
+    const f = fixture();
+    const packet = packetText(f.base);
+    const mergedMain = f.repo.child(
+      [f.base],
+      {
+        [PK]: packet,
+        "apps/web/src/feature.ts": "export const feature = 1;\n",
+      },
+      "merged work item",
+    );
+    const reuse = (steps) =>
+      f.run({
+        packet,
+        from: mergedMain,
+        guardBase: mergedMain,
+        withPacket: false,
+        steps,
+      });
+    assertPass(
+      reuse([{ "apps/web/src/feature.ts": "export const feature = 2;\n" }]),
+    );
+    assertRejected(
+      reuse([{ "governance/decision-log.json": "{}\n" }]),
+      "governance/decision-log.json (M) is outside ALLOWED_SCOPE",
+    );
+    assertRejected(
+      f.run({
+        packet,
+        approval: packetText(f.base, { allowed: ["apps/web/tests/*"] }),
+        from: mergedMain,
+        guardBase: mergedMain,
+        withPacket: false,
+        steps: [{ "apps/web/src/feature.ts": "export const feature = 3;\n" }],
+      }),
+      "Packet differs from the owner-approved Packet",
+    );
+  });
+
+  test("CHANGED (v4, P2-920): a merged Packet may carry only the owner's own revision", () => {
+    const f = fixture();
+    const packet = packetText(f.base);
+    const mergedMain = f.repo.child(
+      [f.base],
+      { [PK]: packet },
+      "merged work item",
+    );
+    const revised = packetText(f.base, {
+      allowed: ["apps/web/src/*", "apps/web/tests/*", "apps/web/lib/*"],
+    });
+    const change = { "apps/web/lib/helper.ts": "export const helper = 1;\n" };
+    assertPass(
+      f.run({
+        packet: revised,
+        from: mergedMain,
+        guardBase: mergedMain,
+        withPacket: false,
+        steps: [{ [PK]: revised, ...change }],
+      }),
+    );
+    assertRejected(
+      f.run({
+        packet: revised,
+        approval: packet,
+        from: mergedMain,
+        guardBase: mergedMain,
+        withPacket: false,
+        steps: [{ [PK]: revised, ...change }],
+      }),
+      "Packet differs from the owner-approved Packet",
+    );
+  });
+
+  test("PRESERVED: an existing Packet on main never authorizes another work item's branch", () => {
     const f = fixture();
     const reuse = f.run({
       packet: packetText(f.base, { id: "P9-001", branch: "wi/P9-001-again" }),
       branch: "wi/P9-001-again",
     });
-    assertRejected(reuse, `Packet ${MERGED_PACKET} already exists on main`);
+    assertRejected(reuse, "Packet must contain exactly one TYPE line");
   });
 });
 
@@ -719,7 +792,7 @@ const P2_916_DISPOSITION = {
   "Edit(/rosuno-authority/**)": "deny",
   "Edit(/.github/**)": "open",
   "Edit(/.claude/**)": "deny",
-  "Edit(/CLAUDE.md)": "ask",
+  "Edit(/CLAUDE.md)": "open",
   "Edit(/docs/process/**)": "open",
   "Edit(/.gitmodules)": "open",
   "Edit(/supabase/config.toml)": "open",
@@ -789,11 +862,10 @@ const PROBE = {
 // The only kinds of operation the ask list may gate.
 const ASK_FAMILIES = [
   /^Bash\(git push\*\)$/,
-  /^Bash\(git (-C|-c|--git-dir|--work-tree)\*?\s?\*?\)$/,
-  /^Edit\((\/|\*\*\/)(CLAUDE\.md|CLAUDE\.local\.md|AGENTS\.md)\)$/,
+  // P2-920: global-option forms prompt only when they push (read-only use is open).
+  /^Bash\(git (-C \* |-c \* |--git-dir\* |--work-tree\* )push\*\)$/,
   /^Bash\(gh [a-z-]+( [a-z-]+)?\*\)$/,
   /^Bash\((npx )?supabase [^)]*\*\)$/,
-  /^mcp__\*$/,
 ];
 
 // Static model: a rule matches when its whole pattern, with `*` as a wildcard,
@@ -863,21 +935,43 @@ describe("P2-919 Builder settings contract (authorization limits)", () => {
         `unexpected ask rule ${rule}`,
       );
     }
+    // P2-920 (UOM v2.0 §13): no repository allowlist or ban stops an owner-enabled
+    // tool from loading; project .mcp.json servers are still not auto-trusted.
     assert.deepEqual(Object.keys(settings).sort(), [
-      "allowedMcpServers",
       "enableAllProjectMcpServers",
       "permissions",
     ]);
     assert.deepEqual(Object.keys(settings.permissions), ["deny", "ask"]);
     assert.equal(settings.enableAllProjectMcpServers, false);
-    assert.deepEqual(settings.allowedMcpServers, []);
+    for (const rule of [...deny, ...ask]) {
+      assert.doesNotMatch(
+        rule,
+        /^(enable__)?mcp__/,
+        `tool-family rule ${rule}`,
+      );
+    }
+    // P2-920 connector correction: an empty allowedMcpServers list blocks every
+    // MCP server, including connectors the cloud host delivers. No committed
+    // allowlist, denylist, connector switch-off or plugin-only lock may return
+    // without a PROCESS change that edits this assertion.
+    for (const key of [
+      "allowedMcpServers",
+      "deniedMcpServers",
+      "disableClaudeAiConnectors",
+      "allowManagedMcpServersOnly",
+      "strictPluginOnlyCustomization",
+      "enabledMcpjsonServers",
+      "disabledMcpjsonServers",
+    ]) {
+      assert.equal(key in settings, false, `committed MCP restriction ${key}`);
+    }
     assert.doesNotMatch(
       raw,
       /bypassPermissions|dangerously|defaultMode|"allow"|"hooks"|"env"|"sandbox"|additionalDirectories|mcpServers"\s*:\s*\{|apiKeyHelper/,
     );
   });
 
-  test("PRESERVED: self-configuration, secrets and private authority stay denied; instructions prompt", () => {
+  test("PRESERVED: self-configuration, secrets and private authority stay denied; instruction edits are open", () => {
     for (const rule of [
       "Edit(/.claude/**)",
       "Edit(**/.claude/**)",
@@ -888,10 +982,6 @@ describe("P2-919 Builder settings contract (authorization limits)", () => {
       "Read(./.env.*)",
       "Read(./**/.env)",
       "Read(./**/.env.*)",
-      "mcp__remote-devices__*",
-      "mcp__claude-in-chrome__*",
-      "mcp__Claude_Browser__*",
-      "enable__mcp__*",
     ]) {
       assert.ok(deny.includes(rule), rule);
     }
@@ -902,9 +992,8 @@ describe("P2-919 Builder settings contract (authorization limits)", () => {
       "Edit(**/CLAUDE.local.md)",
       "Edit(/AGENTS.md)",
       "Edit(**/AGENTS.md)",
-      "mcp__*",
     ]) {
-      assert.ok(ask.includes(rule), rule);
+      assert.ok(!deny.includes(rule) && !ask.includes(rule), rule);
     }
   });
 
@@ -986,6 +1075,8 @@ describe("P2-919 Builder settings contract (authorization limits)", () => {
       "git merge refs/rosuno/main",
       "git merge --no-ff refs/rosuno/main",
       "git merge-base refs/rosuno/main HEAD",
+      "git -C . log --oneline",
+      "git -c core.pager=cat show HEAD",
       "gh pr view 91 --repo NatthanPrevot/Rosuno",
       "gh pr checks 91 --repo NatthanPrevot/Rosuno",
       "gh pr diff 91 --repo NatthanPrevot/Rosuno",
@@ -1012,7 +1103,8 @@ describe("P2-919 CLAUDE.md contract", () => {
       "Never write authority text or prompt-only context into any file.",
       "G-1…G-5 and the CA-* items stay configuration, never defaults or seeds.",
       "Pushing commits to `origin` is a distinct, separately owner-authorized publication gate: do not push on your own at the end of implementation.",
-      "Never create, edit, mark ready, review, approve or merge a pull request, by any tool or API",
+      "Never approve or review a pull request, by any tool, API or identity.",
+      "Designated human approval before merge is mandatory (locked authority).",
       "The grant never overrides an effective tool deny.",
       "do not reach the denied result through Shell redirection, an alternate interpreter, another worktree, a different tool or another identity",
       "Never take a concealed alternative route.",
@@ -1027,13 +1119,20 @@ describe("P2-919 CLAUDE.md contract", () => {
     }
   });
 
-  test("CHANGED: autonomous engineering, FIX path, integration merge and prompt-gated publication", () => {
+  test("CHANGED (P2-920): autonomous engineering, in-scope correction, optional review and prompt-gated publication", () => {
     for (const phrase of [
       "investigate any part of Rosuno (any phase, any age, merged or open)",
-      "With one owner-adopted Packet and the owner's grant (UOM §15.1 / C1 rev5.11 §C1.2)",
-      "merge current owner `main` into the work-item branch when needed; correct your own unmerged migrations",
-      "A defect in merged work needs a FIX Packet (you draft it); never rewrite merged history or a historical migration.",
-      "run exactly `git push origin <branch>` once: the permission prompt is the owner's approval, and a denied prompt ends the attempt",
+      "The operating model is UOM v2.0 with C1 rev6.0.",
+      "With one owner-adopted Packet and the owner's grant: the whole engineering task.",
+      "merge current owner `main` into the work-item branch when needed, repeat validation after every correction",
+      "Never ask permission for individual files, commands, tests or ordinary fixes.",
+      'After merge, inside the Packet\'s scope, when the owner says "correct … under <ID>": same branch name, new commits, the same Packet.',
+      "Never rewrite merged history or a historical migration.",
+      "Independent review (ChatGPT, the Independent Backup or anyone else) is optional and only on the owner's request.",
+      "never record a review that did not happen",
+      "Owner-enabled tools, connectors and MCP servers may be used.",
+      "The repository commits no MCP server allowlist, denylist or connector switch-off",
+      "run exactly `git push origin <branch>`. The permission prompt is the owner's approval, and a denied prompt ends the attempt.",
       "Configuration integrity: every `CLAUDE.md`, `CLAUDE.local.md`, `AGENTS.md`, `.claude/**` and `.mcp.json` path equals owner `main` or the blobs the Packet names.",
       "The guard judges scope on the net diff against current owner `main`, and checks every commit on its own for credential-like or private-authority paths and for symlinks, submodules or other special objects",
       "Integration merges of current owner `main` (fetched from the owner repository) are normal and need no approval; never rebase, and never merge any other branch into yours.",
@@ -1048,6 +1147,12 @@ describe("P2-919 CLAUDE.md contract", () => {
       "<BASE_SHA from the Packet>",
       "Never access any repository other than `origin`.",
       "authored by independent ChatGPT outside Claude",
+      "UOM v1.7.10",
+      "C1 rev5.11",
+      "Never use a connector or MCP tool unless the Access Profile grants it.",
+      "Instruction-file edits prompt the owner",
+      "AP-0 grants none of them",
+      "run only as the Access Profile grants",
     ]) {
       assert.ok(!text.includes(obsolete), obsolete);
     }
