@@ -157,9 +157,10 @@ function assertHistoricalP1011AndCurrentP2Baseline(baseline, migrations) {
     assert.equal(baseline.catalog_fingerprint.row_count, 1938);
     return;
   }
-  assert.equal(baseline.migration_inventory.length, 14);
-  assert.equal(baseline.baseline_id, "rosuno-staging-p2-007-20261022-v1");
-  assert.equal(baseline.migration_inventory.length, 14);
+  // P2-920 (UOM v2.0 §15): the accepted P2-007 fourteen-migration baseline is a
+  // pinned historical prefix; any later appended baseline is validated by
+  // validateDriftReport, so recording a closure needs no test edit.
+  assert.ok(baseline.migration_inventory.length >= 14);
   assert.equal(
     baseline.migration_inventory[13].migration_id,
     "20261020070000_p2_registration_abuse_control",
@@ -168,8 +169,8 @@ function assertHistoricalP1011AndCurrentP2Baseline(baseline, migrations) {
     baseline.migration_inventory[13].sha256,
     "32649648b0d75763ba1003957d24febffc2050951ca49b962687c2427a5f4db5",
   );
-  assert.equal(baseline.accepted_evidence.length, 12);
-  assert.equal(baseline.evidence.length, 12);
+  assert.ok(baseline.accepted_evidence.length >= 12);
+  assert.equal(baseline.evidence.length, baseline.accepted_evidence.length);
   assert.equal(baseline.accepted_evidence[10].path, evidencePath);
   assert.equal(
     baseline.accepted_evidence[10].sha256,
@@ -187,17 +188,32 @@ function assertHistoricalP1011AndCurrentP2Baseline(baseline, migrations) {
     baseline.evidence[11],
     "governance/evidence/p2-007-governance-lifecycle-closure.json",
   );
-  assert.equal(baseline.catalog_fingerprint.format, "rosuno-p1-catalog-v1");
+  const p2007Manifest = {
+    baseline_id: "rosuno-staging-p2-007-20261022-v1",
+    checked_environment: "staging",
+    project: { name: "Rosuno Staging", project_ref: "mxjlvmowmodzdtdfgqpb" },
+    migration_inventory: baseline.migration_inventory.slice(0, 14),
+    accepted_evidence: baseline.accepted_evidence.slice(0, 12),
+    catalog_fingerprint: {
+      format: "rosuno-p1-catalog-v1",
+      sha256:
+        "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d",
+      canonical_byte_length: 658601,
+      row_count: 1970,
+    },
+  };
   assert.equal(
-    baseline.catalog_fingerprint.sha256,
-    "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d",
-  );
-  assert.equal(baseline.catalog_fingerprint.canonical_byte_length, 658601);
-  assert.equal(baseline.catalog_fingerprint.row_count, 1970);
-  assert.equal(
-    baseline.baseline_digest,
+    "sha256:" +
+      createHash("sha256").update(JSON.stringify(p2007Manifest)).digest("hex"),
     "sha256:5233572ad1c0ef93ca01391bf3dd0dd6c9ea5735a33d4d547bce297ecd4877d5",
   );
+  assert.equal(baseline.catalog_fingerprint.format, "rosuno-p1-catalog-v1");
+  if (baseline.migration_inventory.length === 14) {
+    assert.equal(
+      baseline.baseline_digest,
+      "sha256:5233572ad1c0ef93ca01391bf3dd0dd6c9ea5735a33d4d547bce297ecd4877d5",
+    );
+  }
   assert.ok(
     Date.parse(baseline.checked_at) > Date.parse("2026-09-23T03:14:20Z"),
   );
@@ -4230,18 +4246,15 @@ test("P1-008 accepted closure remains valid under the current P1-011 baseline", 
   pendingBaseline.checked_at = "2026-09-16T04:43:44.771854Z";
   pendingBaseline.migration_inventory =
     pendingBaseline.migration_inventory.filter((item) => item.sequence <= 9);
-  pendingBaseline.accepted_evidence = pendingBaseline.accepted_evidence.filter(
+  const p1007EvidenceCount = pendingBaseline.accepted_evidence.findIndex(
     (item) =>
-      item.path !==
-        "governance/evidence/p1-008-governance-lifecycle-closure.json" &&
-      item.path !==
-        "governance/evidence/p1-009-governance-lifecycle-closure.json" &&
-      item.path !==
-        "governance/evidence/p1-010-governance-lifecycle-closure.json" &&
-      item.path !==
-        "governance/evidence/p1-011-governance-lifecycle-closure.json" &&
-      item.path !==
-        "governance/evidence/p2-007-governance-lifecycle-closure.json",
+      item.path ===
+      "governance/evidence/p1-008-governance-lifecycle-closure.json",
+  );
+  assert.ok(p1007EvidenceCount > 0);
+  pendingBaseline.accepted_evidence = pendingBaseline.accepted_evidence.slice(
+    0,
+    p1007EvidenceCount,
   );
   pendingBaseline.catalog_fingerprint = {
     format: "rosuno-p1-catalog-v1",
@@ -4249,13 +4262,9 @@ test("P1-008 accepted closure remains valid under the current P1-011 baseline", 
     canonical_byte_length: 348401,
     row_count: 1089,
   };
-  pendingBaseline.evidence = pendingBaseline.evidence.filter(
-    (path) =>
-      path !== "governance/evidence/p1-008-governance-lifecycle-closure.json" &&
-      path !== "governance/evidence/p1-009-governance-lifecycle-closure.json" &&
-      path !== "governance/evidence/p1-010-governance-lifecycle-closure.json" &&
-      path !== "governance/evidence/p1-011-governance-lifecycle-closure.json" &&
-      path !== "governance/evidence/p2-007-governance-lifecycle-closure.json",
+  pendingBaseline.evidence = pendingBaseline.evidence.slice(
+    0,
+    p1007EvidenceCount,
   );
   const historical = await historicalRepository(t);
   assert.doesNotThrow(() =>

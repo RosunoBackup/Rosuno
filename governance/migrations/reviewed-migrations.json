@@ -368,14 +368,14 @@
       ],
       "work_item_refs": ["WI-P2-P3-904-P3-003-SECURITY-CORRECTION"],
       "decision_refs": ["DEC-20261113-P3-904-P3-003-SECURITY-CORRECTION"],
-      "release_refs": [],
-      "reviewed": false,
-      "reviewed_by": "pending designated human PR review",
-      "reviewed_at": null,
-      "applied_environment": "none",
+      "release_refs": ["REL-20261114-P3-904-STAGING-APPLICATION"],
+      "reviewed": true,
+      "reviewed_by": "Rosuno",
+      "reviewed_at": "2026-11-13T19:43:51Z",
+      "applied_environment": "staging",
       "non_production_validation": true,
       "drift_check": "clean",
-      "rollback_plan": "Before merge: forward-only correction commits on the work-item branch. After merge: a separately reviewed forward corrective migration that restores the prior function definitions and grants; no destructive rollback, and no evidence, evaluation or audit row is removed.",
+      "rollback_plan": "Applied to Rosuno Staging only. A verified defect requires a separately authorized, reviewed forward-only corrective migration that restores the prior function definitions and grants; this migration, every earlier migration and the migration history stay byte-identical, and no evidence, evaluation or audit row is removed.",
       "depends_on": ["20261020070000_p2_registration_abuse_control"]
     }
   ]

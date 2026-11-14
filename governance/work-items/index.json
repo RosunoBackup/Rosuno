@@ -2310,11 +2310,11 @@
         "New tables, roles, capabilities, eligibility factors, thresholds, policies or providers.",
         "Any change to the accepted P3-002 applicant-creation audit behaviour."
       ],
-      "status": "in_progress",
+      "status": "completed",
       "owner": "NatthanPrevot",
       "reviewer": {
         "identity": "Rosuno",
-        "status": "pending"
+        "status": "approved"
       },
       "priority": "P2",
       "authority_refs": [
@@ -2332,7 +2332,9 @@
       "acceptance_criteria": [
         "The P3-904 disposable PostgreSQL proof passes on the final head: authorization, concurrency, atomicity, eligibility decision integrity, application and database parity, and rollback and catalog reconciliation.",
         "P3-001, P3-002 and P3-003 regressions, p0:validate and the P0 suite pass on the final head.",
-        "Exact-head independent security review and designated human review pass before merge."
+        "Exact-head independent security review and designated human review pass before merge.",
+        "The unchanged migration was applied to Rosuno Staging only after Gate 5 rollback validation and a separately authorized Gate 6, and was independently verified; Production, hosting deployment and activation remain separate owner gates.",
+        "Closure status of the criterion above on review: designated human review met (Rosuno review 5897022551); exact-head independent security review not evidenced and not claimed; closed under UOM v2.0 / DL-ENG-2 by owner decision."
       ],
       "validation_commands": [
         "pnpm install --frozen-lockfile",
@@ -2346,12 +2348,12 @@
         "node apps/web/tests/p3-904-db-proof.mjs",
         "node apps/web/tests/m4-db-proof.mjs"
       ],
-      "environment": "none",
-      "release_refs": [],
+      "environment": "staging",
+      "release_refs": ["REL-20261114-P3-904-STAGING-APPLICATION"],
       "migration_refs": ["20261106090000_p3_904_professional_write_boundary"],
-      "rollback_reference": "Before merge: forward-only correction commits on the work-item branch. After merge: a separately reviewed forward corrective migration that restores the prior function definitions and grants; no destructive rollback, and no evidence, evaluation or audit row is removed.",
+      "rollback_reference": "Applied to Rosuno Staging only. A verified defect requires a separately authorized, reviewed forward-only corrective migration that restores the prior function definitions and grants; this migration, every earlier migration and the migration history stay byte-identical, and no evidence, evaluation or audit row is removed.",
       "created_at": "2026-11-13T12:02:23Z",
-      "updated_at": "2026-11-13T12:02:23Z"
+      "updated_at": "2026-11-14T14:51:22Z"
     }
   ]
 }

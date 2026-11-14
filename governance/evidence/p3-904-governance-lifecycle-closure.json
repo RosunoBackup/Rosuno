@@ -1,0 +1,234 @@
+{
+  "version": 1,
+  "evidence_id": "P3-904-GATE7-GOVERNANCE-CLOSURE-20261114",
+  "work_item_id": "WI-P2-P3-904-P3-003-SECURITY-CORRECTION",
+  "lifecycle": "P3-904 CLOSURE RECORD (UOM v2.0 §15) — CANONICAL ONLY WHEN THE P2-920 PR MERGES",
+  "candidate_recorded_at": "2026-11-14T14:51:22Z",
+  "source_authority": {
+    "locked_originals": "Eleven current LOCKED Rosuno originals remain external immutable authority; not copied or modified",
+    "adopted_uom": "UOM v1.7.10",
+    "adopted_cloud_builder": "C1 rev5.11",
+    "engineering_rulings": "DL-ENG-1",
+    "packet": {
+      "path": "docs/work-items/P3-904/PACKET.md",
+      "revision": 3,
+      "blob": "02d5a4a9ae8b8e391ff7908e2c60a6cf4909a871",
+      "sha256": "e9df0b5148c7de69c01433e3930c99f9401a3db16bec25dcda2e36a50947b18f",
+      "owner_adoption_commit": "c986509de535e3a57f877eb8eea711049c7581fd"
+    }
+  },
+  "repository": {
+    "owner": "NatthanPrevot/Rosuno",
+    "implementation_pr": 93,
+    "implementation_head": "692d8a8e1ab94c0db070e1b78ba9a977a5eb08f4",
+    "implementation_merge_commit": "fc31ed34763c44d5ada0c0d749e0a3e901e96519",
+    "implementation_parent_commits": [
+      "299a0e8d72f77e0b440c15eb5c7ffd29e7fd4061",
+      "692d8a8e1ab94c0db070e1b78ba9a977a5eb08f4"
+    ],
+    "implementation_tree": "c9ed4c6e7a024c3cbf7dbd781f64a792afdb219a",
+    "merge_tree_equals_reviewed_head_tree": true,
+    "pr_created_at": "2026-11-13T19:31:22Z",
+    "pr_merged_at": "2026-11-13T19:48:48Z",
+    "implementation_review_by": "Rosuno",
+    "implementation_review_id": "5897022551",
+    "implementation_reviewed_at": "2026-11-13T19:43:51Z",
+    "required_checks": {
+      "p0_workflow_run_id": "43493010756",
+      "p0_workflow_conclusion": "success",
+      "trusted_guard_workflow_run_id": "43493309956",
+      "rosuno_guard_conclusion": "success",
+      "rosuno_guard_exact_head_commit_status": "success",
+      "head": "692d8a8e1ab94c0db070e1b78ba9a977a5eb08f4",
+      "source": "owner-retrieved from GitHub"
+    },
+    "gate0_review": {
+      "reviewer": "Backup",
+      "result": "PASS",
+      "record": "owner repository governance/decision-log.json, DEC-20261113-P3-904-P3-003-SECURITY-CORRECTION evidence: Independent Backup Gate 0 PASS of revision 3, accepted by the owner before adoption",
+      "artifact_sha256": null,
+      "source": "owner repository record"
+    },
+    "exact_head_security_review": {
+      "status": "NOT_EVIDENCED",
+      "required_by": "UOM v1.7.10 §59.1 and P3-904 Packet REV3 §1 (mandatory exact-head independent review)",
+      "searched": "owner main records, PR #93 body (lists it as pending; 0 comments), Gate 5/6 evidence, earlier evidence archives",
+      "claimed": false,
+      "requirement_removed_by": "UOM v2.0 §8 and DL-ENG-2 G1, adopted by express owner statement (received in the Builder session at 2026-11-14T14:33:36Z; not retroactive)",
+      "owner_acceptance": "P3-904 security status accepted by the owner on the recorded evidence: real-PostgreSQL proof 35/35, red check, required CI, designated human approval, Gate 5, Gate 6 and independent post-application verification"
+    },
+    "subsequent_independent_security_review": null,
+    "review_and_check_sources": "Review ID, review time, approved commit, workflow runs and the exact-head rosuno-guard status retrieved by the owner from GitHub; approval state, Rosuno reviewer, successful head status and merge time also confirmed by the Builder from the GitHub search index"
+  },
+  "migration": {
+    "id": "20261106090000_p3_904_professional_write_boundary",
+    "sequence": 15,
+    "path": "supabase/migrations/20261106090000_p3_904_professional_write_boundary.sql",
+    "sha256": "7f05e4066a245471a8e33d5cfb27a539373eb75b270a17990afced441e4ebbe1",
+    "byte_length": 106057,
+    "supabase_version": "20261106090000",
+    "reviewed_by": "Rosuno",
+    "reviewed_at": "2026-11-13T19:43:51Z",
+    "applied_environment": "staging",
+    "applied_migrations": 15,
+    "unchanged_earlier_migrations": 14,
+    "forward_only_rollback_required": true
+  },
+  "gate5": {
+    "result": "PASS",
+    "project_ref": "mxjlvmowmodzdtdfgqpb",
+    "server_version": "17.11",
+    "authorization": "owner-granted AP-2 migration-rollback-validate for this operation only (Packet REV3 §8.5)",
+    "executor": "Claude Code session holding the Rosuno — Supabase Staging connector, as postgres",
+    "prestate": {
+      "migration_history_count": 14,
+      "latest_migration": "20261020070000_p2_registration_abuse_control",
+      "public_tables": 61,
+      "rls_enabled_tables": 61,
+      "public_functions": 28,
+      "rb1_md5": "085ea3549ea7da589008f57f2f67d0ac",
+      "catalog_60_table_sha256": "edffaba2b7e081c3c8c78c158ce33a444a448671bf338188356d1118f0a9960a",
+      "catalog_full_post_p2_sha256": "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d"
+    },
+    "rollback_validation": {
+      "generated_sql_sha256": "d8c561ebd3f31f3ed16ff673267df626882ae4c3a6dedf34d5755df546215847",
+      "transport_guard_sha256": "11cdca9c0d79d4e4df565f777cf73af2c0d9ddbc6cba8833bde6586477aa7849",
+      "executed_payload_sha256": "a2cea23b6101cd786572cdf659e327e3bb4bcdd5707c7d3aeb58f7a8f6b2f838",
+      "result_text_sha256": "cf5323045e18cb1b73d91893d36152fc903280c30acdfa554b4e7c4d8af7a738",
+      "validation_checks": 14,
+      "checks_passed": 14,
+      "attempts": 1,
+      "catalog_diff_entries": 40,
+      "catalog_diff_equals_allowlist": true,
+      "in_transaction_rb1_md5": "34c0daaf629514f3b781e41a10f94d1f",
+      "final_transaction_action": "ROLLBACK",
+      "transaction_id": "2013",
+      "transaction_status": "aborted",
+      "restoration": "EXACT",
+      "persistent_state_changed": false
+    },
+    "report_sha256": "45a919cadfaafdb05135534d310f4720963d62fcba13c7dba0764c2ef1d78717"
+  },
+  "gate6": {
+    "result": "PASS",
+    "project_ref": "mxjlvmowmodzdtdfgqpb",
+    "executor": "owner",
+    "tool": "Supabase CLI 2.116.0 db push",
+    "source_commit": "fc31ed34763c44d5ada0c0d749e0a3e901e96519",
+    "dry_run_entries": [
+      "20261106090000_p3_904_professional_write_boundary.sql"
+    ],
+    "dry_run_output_sha256": null,
+    "persistent_application_attempts": 1,
+    "application_exit": 0,
+    "application_completed_at": null,
+    "owner_attestation": {
+      "rosuno_launched": false,
+      "staging_observed_application_traffic": false,
+      "staging_registered_users": false,
+      "scope": "owner observation; not an independent verification of every possible external deployment"
+    },
+    "source": "owner-supplied execution facts"
+  },
+  "independent_verification": {
+    "result": "PASS",
+    "verifier": "Claude Code session holding the Staging connector; read-only transactions only",
+    "verifier_differs_from_executor": true,
+    "observed_at": "2026-11-14T00:37:25.228272Z",
+    "query_sha256": "5eca2e790849ecd646379fcdf7a7dad26d8cf397c7df0f54933b8e43afd4ef07",
+    "checks": 10,
+    "checks_passed": 10,
+    "results_sha256": "05bb8b602e569386b3d89c94388751a8a3e55426f9ca188d5a2401e6200e7f6b",
+    "report_sha256": "ce134dcf86ce7c900401ff10a5210881dc66a670cca02afa09e361e66ce4b8b4",
+    "migration_history_count": 15,
+    "new_history_row": {
+      "version": "20261106090000",
+      "name": "p3_904_professional_write_boundary",
+      "statements": 88,
+      "created_by": null,
+      "idempotency_key": null,
+      "rollback": null
+    },
+    "earlier_history_rows_unchanged": true,
+    "public_tables": 61,
+    "rls_enabled_tables": 61,
+    "public_functions": 55,
+    "function_owner": "postgres",
+    "authenticated_executable_public_functions": 15,
+    "anon_executable_public_functions": 0,
+    "service_role_executable_new_api_functions": 0,
+    "m4_relations_service_role_and_authenticated": "SELECT only; anon none; no column grants",
+    "audit_events_acl_unchanged": true,
+    "rb1_md5_after": "34c0daaf629514f3b781e41a10f94d1f",
+    "rb1_equals_gate5_in_transaction": true,
+    "application_tables_have_rows": false
+  },
+  "catalog": {
+    "subset_60_table": {
+      "query": "connector-adapted tools/p0/catalog/p1-011-postapplication.sql",
+      "query_sha256": "834adaa0521e688796359a2be93205d04ee489b975523b39ea48f2c4fa3aae5d",
+      "before": {
+        "records": 1938,
+        "bytes": 640365,
+        "sha256": "edffaba2b7e081c3c8c78c158ce33a444a448671bf338188356d1118f0a9960a"
+      },
+      "after": {
+        "records": 1938,
+        "bytes": 640324,
+        "sha256": "ef70584063b7e7f484a5d7c430c3d87211d1e8cf5b2202794bf2d40216ba4bab",
+        "observed_at": "2026-11-14T00:38:56.964903Z"
+      }
+    },
+    "full_post_p2_scope": {
+      "query": "owner-accepted reconstruction of the P2-007 measurement scope; reproduced the accepted 0f823b1c value exactly before application",
+      "query_sha256": "81a3c52a3567ba68b19b4451dd624d0d8d152a52c8550322dbf3b463284324ca",
+      "query_external_to_repository": true,
+      "before": {
+        "records": 1970,
+        "bytes": 658601,
+        "sha256": "0f823b1ce633d925183e1f1404f962f5b524744cf09b52acbadf0b1744032e9d"
+      },
+      "after": {
+        "records": 1970,
+        "bytes": 658560,
+        "sha256": "afd6e96d2b2d8c87c012878c1d5033af6da00f174c0747735a9c714a99aa106a",
+        "observed_at": "2026-11-14T00:42:35.801014Z"
+      }
+    },
+    "new_functions_outside_fingerprint_scope": 27,
+    "new_functions_proven_by": "RB-1 digest equality with the Gate 5 in-transaction state and verification checks",
+    "format": "rosuno-p1-catalog-v1"
+  },
+  "security_advisor": {
+    "observed_at": "2026-11-14T00:37:28.686Z",
+    "info": 31,
+    "warn": 15,
+    "warn_code": "authenticated_security_definer_function_executable",
+    "pre_existing_warn": [
+      "has_manage_attorney_verification_scope",
+      "has_resource_metadata_access"
+    ],
+    "new_warn_by_design": 13,
+    "classification": "P3-904 Packet REV3 §4.3 operation functions",
+    "unexplained": 0
+  },
+  "evidence_packages": {
+    "gate5_gate6_zip_sha256": "6e36c85a10862546d9af5a90df7c80f35057101fdb3f6f225b8b41e1aaf61809",
+    "owner_retained": true,
+    "external_to_repository": true
+  },
+  "limitations": {
+    "staging_hosting_deployment_of_fc31ed3": "NOT_PERFORMED_SEPARATE_OWNER_GATE",
+    "behavioural_smoke_test": "NOT_PERFORMED_SEPARATE_OWNER_GATE",
+    "pre_merge_builds_against_staging": "DIRECT_M4_WRITES_REFUSED_42501",
+    "production": "NOT_AUTHORIZED",
+    "staging_connector_profile": "OWNER_DECISION_PENDING_READ_WRITE_POSTGRES_NOT_AP1",
+    "gate7_pr": "NOT_YET_MERGED_AT_RECORDING"
+  },
+  "change_scope": {
+    "recorded_by_work_item": "P2-920",
+    "supabase_mutation": false,
+    "deployment": false,
+    "historical_migration_change": false
+  }
+}
